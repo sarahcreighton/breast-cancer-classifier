@@ -1,0 +1,26 @@
+# For more info/suggestions: 
+#   - https://github.com/github/gitignore 
+#   - https://git-scm.com/docs/gitignore
+
+__pycache__/
+
+wdbc-env
+uv.lock
+.venv
+
+# Untracked folders/files
+tmp/
+00_*/
+
+# Operating system
+.DS_Store 
+Thumbs.db
+
+# Obsidian
+.obsidian
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
