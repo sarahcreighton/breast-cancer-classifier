@@ -17,7 +17,7 @@ Open a terminal (macOS/Linux) or Git Bash (Windows) in this repo, and run the fo
 
 1. Create a virtual environment called `wdbc-env`:
     ```
-    uv venv wbcd-env --python 3.11
+    uv venv wdbc-env --python 3.11
     ```
 
 2. Activate the environment:
@@ -67,4 +67,4 @@ deactivate
 If you have issues, view the `pyproject.toml` to see which libraries and dependencies are required. You may need to install them yourself. Good luck!
 
 ---
-_Last Updated: 2026-02-27_
+_Last Updated: 2026-02-28_
