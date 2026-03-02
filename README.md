@@ -1,25 +1,38 @@
-# Breast Cancer Wisconsin Diagnostic — ML Classifier
+# Breast Cancer ML Classifier
 
-**DSI Course | Cohort 8**
 A machine learning classifier to assist radiologists in distinguishing malignant from benign breast masses using cell nucleus morphology features.
 
 ---
 
 ## Business Question
 
-> Can we develop a machine learning model to assist radiologists in distinguishing malignant from benign breast masses using cell morphology features, in order to reduce unnecessary biopsies while maintaining high cancer detection rates?
+> Can we develop a machine learning model that uses cell morphology features to help radiologists differentiate malignant from benign breast masses, thereby reducing unnecessary biopsies without compromising cancer detection rates?
 
 ---
 
 ## Repository Structure
 
 ```
-breast_cancer_classifier/
-├── data/                               # Dataset storage
-├── breast_cancer_classifier.ipynb      # Main analysis notebook
-├── pyproject.toml                      # uv project dependencies
-├── uv.lock                             # Locked dependency versions
-└── README.md
+breast-cancer-classifier/
+├── .github
+│   └── pull_request_template.md
+├── data
+│   ├── processed
+│   └── raw
+├── experiments
+├── models
+├── notebooks
+│   └── 02_preprocessing.ipynb
+├── reports
+│   └── figures
+├── src
+│   └── utils
+├── .gitignore
+├── LICENSE
+├── pyproject.toml
+├── README.md
+├── repo_workflow.md
+└── SETUP.md
 ```
 
 ---
@@ -85,33 +98,35 @@ breast_cancer_classifier/
 
 ## Team
 
-| Name | GitHub | Contribution |
+| Name | GitHub | Primary Role |
 |---|---|---|
-| Marie Perry | [@mvrieperry](https://github.com/mvrieperry) | TBD |
-| Sarah Creighton | [@sarahcreighton](https://github.com/sarahcreighton) | TBD |
-| Rajesh Detroja | [@Rajesh-Detroja](https://github.com/Rajesh-Detroja) | TBD |
+| Marie Perry | [@mvrieperry](https://github.com/mvrieperry) | Evaluation & Integration Lead |
+| Sarah Creighton | [@sarahcreighton](https://github.com/sarahcreighton) | EDA & Multicollinearity Lead |
+| Rajesh Detroja | [@Rajesh-Detroja](https://github.com/Rajesh-Detroja) | Linear Modeling Lead |
+| Sean Rampersad | [@seanlr-github](https://github.com/seanlr-github) | Tree-based Modeling Lead |
 
 ---
 
 ## Technical Stack
 
-- **Language:** Python 3
-- **Libraries:** scikit-learn, pandas, numpy, matplotlib, seaborn
+- **Language:** Python >= 3.11
+- **Libraries:** scikit-learn, pandas, numpy, matplotlib, seaborn *(see also [pyproject.toml](https://github.com/sarahcreighton/breast-cancer-classifier/blob/main/pyproject.toml))*
 - **Environment:** [uv](https://github.com/astral-sh/uv)
+- **IDE:** VS Code
 
 ---
 
 ## Setup
-
+**Step 1**: Clone the repository
 ```bash
 # Clone the repo
 git clone https://github.com/[username]/breast-cancer-classifier.git
 cd breast-cancer-classifier
-
-# Create virtual environment and install dependencies
-uv venv
-uv sync
-
-# Launch notebook
-uv run jupyter notebook breast_cancer_classifier.ipynb
 ```
+
+**Step 2**: Follow the instrutions in [SETUP.md](https://github.com/sarahcreighton/breast-cancer-classifier/blob/main/SETUP.md)
+- creates the `wdbc-env` virtual environment
+- downloads and installs package dependencies (requires  [`uv`](https://github.com/astral-sh/uv)).
+
+---
+_Last Updated: 2026-03-01_
