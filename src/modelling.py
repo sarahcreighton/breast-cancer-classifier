@@ -1,5 +1,8 @@
 """
 Modelling functions
+- model constructors
+- hyperparameter grids (for tuning)
+- helper utilities related to modelling logic (not training itself)
 
 Author: SC 2026-03-03
 
@@ -16,7 +19,13 @@ def logistic_pipeline(penalty="l2", C=1.0, random_state=42):
     """
     Train logistic regression with optional L1/L2 regularization
     """
-    solver = "liblinear" if penalty in ["l1", "l2"] else "lbfgs"
+    # solver = "liblinear" if penalty in ["l1", "l2"] else "lbfgs"
+    if penalty == "l1":
+        solver = "liblinear"
+    elif penalty == "l2":
+        solver = "lbfgs"
+    elif penalty == "none":
+        solver = "lbfgs"
 
     return Pipeline([
         ("scaler", StandardScaler()),
@@ -28,6 +37,7 @@ def logistic_pipeline(penalty="l2", C=1.0, random_state=42):
             random_state = random_state
         ))
     ])
+
 
 def rf_pipeline(n_estimators=200, max_depth=None, random_state=42):
     """

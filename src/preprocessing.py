@@ -1,5 +1,15 @@
 """
-Pre-processing Functions
+PRE-PROCESSING FUNCTIONS
+
+Dependences: pandas, sklearn, wdbc-env should take care of this though
+
+Notes:
+    Functions can be standalone, but not generally advised, to avoid
+    potential data leakage. One exception: load_raw_data for EDA/figures
+
+    prepare_model_data() produces ML pipeline ready preprocessed data 
+
+    TO DO: Have someone else verify the functions work on their machine
 
 Author: SC 2026-03-03
 """
