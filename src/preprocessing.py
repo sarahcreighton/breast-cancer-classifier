@@ -15,8 +15,21 @@ Author: SC 2026-03-03
 """
 
 import pandas as pd 
+from dataclasses import dataclass
+from typing import Tuple, Optional
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+
+
+#--- Create ModelData class helper ---#
+@dataclass
+class ModelData:
+    X_train: pd.DataFrame
+    X_test: pd.DataFrame
+    y_train: pd.Series
+    y_test: pd.Series
+    scaler: Optional[object] = None
+
 
 
 #--- LOAD RAW DATA ---#
@@ -54,7 +67,7 @@ def load_raw_data(path: str) -> pd.DataFrame:
 
 
 #--- GET MODEL DATA ---#
-def get_model_data(df: pd.DataFrame, encode_target: bool = True) -> tuple[pd.DataFrame, pd.Series]:
+def get_model_data(df: pd.DataFrame, encode_target: bool = True) -> Tuple[pd.DataFrame, pd.Series]:
     """
     Separate data into features (X) and target (y).
 
@@ -76,7 +89,7 @@ def get_model_data(df: pd.DataFrame, encode_target: bool = True) -> tuple[pd.Dat
     if "diagnosis" not in df.columns:
         raise ValueError("Column 'diagnosis' not found in DataFrame.")
     
-    if encode_target:
+    if encode_target and df["diagnosis"].dtype != "int":
         df["diagnosis"] = df["diagnosis"].map({"malignant":0, "benign": 1})
     
     drop_cols = [col for col in ["id","diagnosis"] if col in df.columns]
@@ -150,7 +163,7 @@ def scale_features(X_train, X_test, scaler_cls=StandardScaler):
     return X_train_scaled, X_test_scaled, scaler
 
 
-#--- PREPATE FOR PROCESSING/MODELLING ---#
+#--- PREPARE FOR PROCESSING/MODELLING ---#
 def prepare_model_data(path, test_size=0.2, random_state=42, use_pipeline=True):
     """
     Prepare data for modelling:
@@ -194,10 +207,18 @@ def prepare_model_data(path, test_size=0.2, random_state=42, use_pipeline=True):
     else: 
         X_train, X_test, scaler = scale_features(X_train, X_test)
   
-    return {
-        "X_train": X_train, 
-        "X_test": X_test, 
-        "y_train": y_train, 
-        "y_test": y_test,
-        "scaler": scaler 
-    }
+    return ModelData(
+        X_train = X_train,
+        X_test = X_test,
+        y_train = y_train,
+        y_test = y_test,
+        scaler = scaler
+    )
+
+    # {
+    #     "X_train": X_train, 
+    #     "X_test": X_test, 
+    #     "y_train": y_train, 
+    #     "y_test": y_test,
+    #     "scaler": scaler 
+    # }
