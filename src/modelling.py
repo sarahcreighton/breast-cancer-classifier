@@ -7,6 +7,7 @@ Modelling functions
 Author: SC 2026-03-03
 
 TO DO: documentation (comments, docstrings, README)
+Consider replacing StandardScaler() with more generic scaler_cls()
 """
 
 from sklearn.pipeline import Pipeline
@@ -15,9 +16,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 
+
+#--- PIPELINE CONSTRUCTORS ---#
 def logistic_pipeline(penalty="l2", C=1.0, random_state=42):
     """
-    Train logistic regression with optional L1/L2 regularization
+    Pipeline for logistic regression with optional L1/L2 regularization
     """
     # solver = "liblinear" if penalty in ["l1", "l2"] else "lbfgs"
     if penalty == "l1":
@@ -41,7 +44,7 @@ def logistic_pipeline(penalty="l2", C=1.0, random_state=42):
 
 def rf_pipeline(n_estimators=200, max_depth=None, random_state=42):
     """
-    Train a Random Forest classifier
+    Pipeline for a Random Forest classifier
     """
     # Note: RF does NOT need scaling, but keeping structure consistent
     return Pipeline([
@@ -54,7 +57,7 @@ def rf_pipeline(n_estimators=200, max_depth=None, random_state=42):
 
 def svm_pipeline(C=1.0, kernel="rbf", random_state=42):
     """
-    Train a Support Vector Machine (SVM) classifier
+    Pipeline for a Support Vector Machine (SVM) classifier
     """
     return Pipeline([
         ("scaler", StandardScaler()),
