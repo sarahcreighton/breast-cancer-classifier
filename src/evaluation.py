@@ -1,7 +1,7 @@
 """
 Evaluation utilties for model comparison
 
-*** SUPER IN PROGRESS AND NOT TESTED ***
+*** SUPER IN PROGRESS AND NOT FULLY TESTED ***
 Author: SC 2026-03-03
 """
 
@@ -30,12 +30,11 @@ def evaluate_model(model, X_test, y_test):
     y_proba = model.predict_proba(X_test)[:, 1] if hasattr(model, "predict_proba") else None
 
     return {
-        "roc_auc": roc_auc_score(y_test, y_proba) if y_proba is not None else None,
         "accuracy": accuracy_score(y_test, y_pred),
         "precision": precision_score(y_test, y_pred),
         "recall": recall_score(y_test, y_pred), 
         "f1": f1_score(y_test, y_pred),
-        "confusion_matrix": confusion_matrix(y_test, y_pred)
+        "roc_auc": roc_auc_score(y_test, y_proba) if y_proba is not None else None
     }
 
 
@@ -54,19 +53,3 @@ def compare_models(models_dict, X_train, y_train, X_test, y_test):
         results.append(metrics)
     
     return pd.DataFrame(results)
-
-
-
-#--- CROSS-VALIDATION EVALUATION ---#
-def cross_validate_model(model, X, y, cv=5, scoring="roc_auc"):
-    """
-    Perform cross-validation
-    Returns mean and std of selected metric
-    """
-    scores = cross_val_score(model, X, y, cv=cv, scoring=scoring) #look into n_jobs
-
-    return {
-        "cv_mean": np.mean(scores),
-        "cv_std": np.std(scores),
-        "cv_scores": scores
-    }

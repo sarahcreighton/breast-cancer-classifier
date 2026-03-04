@@ -7,12 +7,11 @@ Modelling functions
 Author: SC 2026-03-03
 
 TO DO: documentation (comments, docstrings, README)
-Consider replacing StandardScaler() with more generic scaler_cls()
 """
 
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
@@ -22,15 +21,43 @@ from sklearn.model_selection import GridSearchCV
 #--- MODEL CONSTRUCTORS ---#
 def logistic_pipeline(penalty="l2", C=1.0, random_state=42):
     """
-    Pipeline for logistic regression with optional L1/L2 regularization
+    Logistic regression pipeline using scikit-learn >=1.3 "future" syntax
+
+    Parameters:
+    -----------
+    penalty : str, default="l2"
+        Supported: "l1", "l2", "elasticnet", None
+        - "l1"          => elasticnet => l1_ratio=1.0
+        - "l2"          => elasticnet => l1_ratio=0.0
+        - "elasticnet"  => elasticnet => l1_ratio=0.5 (default)
+        - None          => no regularization
+    C : float, default=1.0
+        Inverse of regularization strength
+    random_state : int, default=42, random seed for reproducibility
+
+    Returns:
+    --------
+    sklearn pipeline with StandardScaler + LogisticRegression ready for modelling
     """
-    # solver = "liblinear" if penalty in ["l1", "l2"] else "lbfgs"
+    # Map "classic" penalties to future-proof elasticnet/none parameters
     if penalty == "l1":
-        solver = "liblinear"
+        solver = "saga"
+        penalty_final = "elasticnet"
+        l1_ratio_final = 1.0
     elif penalty == "l2":
+        solver = "saga"
+        penalty_final = "elasticnet"
+        l1_ratio_final = 0.0
+    elif penalty == "elasticnet":
+        solver = "saga"
+        penalty_final = "elasticnet"
+        l1_ratio_final = 0.5
+    elif penalty == None:
         solver = "lbfgs"
-    elif penalty == "none":
-        solver = "lbfgs"
+        penalty_final = None
+        l1_ratio_final = None
+    else:
+        raise ValueError(f"Unsupported penalty: {penalty}")
 
     return Pipeline([
         ("scaler", StandardScaler()),
@@ -38,7 +65,8 @@ def logistic_pipeline(penalty="l2", C=1.0, random_state=42):
             penalty = penalty,
             C = C,
             solver = solver,
-            max_iter = 1000,
+            l1_ratio = l1_ratio_final,
+            max_iter = 5000,
             random_state = random_state
         ))
     ])
@@ -73,79 +101,5 @@ def svm_pipeline(C=1.0, kernel="rbf", random_state=42):
 
 
 #--- HYPERPARAMETER GRIDS ---#
-# def logistic_param_grid():
-#     return {
-#         "model__C": [0.01, 0.1, 1, 10],
-#         "model__penalty": ["l1", "l2"]
-#     }
-
-# def rf_param_grid():
-#     return {
-#         "model__n_estimators": [100, 200, 500],
-#         "model__max_depth": [None, 5, 10]
-#     }
-
-# def svm_param_grid():
-#     return {
-#         "model__C": [0.1, 1, 10],
-#         "model__kernel": ["linear", "rbf"]
-#     }
-
-def get_param_grid(model_name: str) -> dict:
-    model_name = model_name.lower()
-
-    if model_name == "logistic":
-        return {
-            "model__C": [0.01, 0.1, 1, 10],
-            "model__penalty": ["l1", "l2"],
-        }
-    elif model_name == "rf":
-        return {
-            "model__n_estimators": [100, 200],
-            "model__max_depth": [None, 5, 10],
-        }
-    elif model_name == "svm":
-        return {
-            "model__C": [0.1, 1, 10],
-            "model__kernel": ["linear", "rbf"],
-        }
-    else:
-        raise ValueError("Unknown model name.")
-
 
 #--- HELPER UTILITIES ---#
-
-# generic tuning
-def tune_model(pipeline, param_grid, X_train, y_train, cv=5, scoring="roc_auc"):
-    """
-    Perform grid search and return best estimator.
-    """
-    grid = GridSearchCV(
-        estimator = pipeline,
-        param_grid = param_grid,
-        cv = cv, 
-        scoring = scoring
-        # look into n_jobs=-1
-    )
-    
-    grid.fit(X_train, y_train)
-
-    return grid.best_estimator_, grid.best_params_, grid.best_score_
-
-
-# # coefficient extraction
-# def extract_logistic_coefs(pipeline, feature_names):
-#     model = pipeline.named_steps["model"]
-#     return pd.Series(model.coef_[0], index=feature_names)
-
-def extract_feature_importance(pipeline, feature_names):
-    model = pipeline.named_steps["model"]
-
-    if hasattr(model, "coef_"):
-        return dict(zip(feature_names, model.coef_.flatten()))
-    
-    elif hasattr(model, "feature_importances_"):
-        return dict(zip(feature_names, model.feature_importances_))
-    
-    else:
-        return None 
