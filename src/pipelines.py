@@ -21,56 +21,20 @@ from sklearn.model_selection import GridSearchCV
 #--- MODEL CONSTRUCTORS ---#
 def logistic_pipeline(penalty="l2", C=1.0, random_state=42):
     """
-    Logistic regression pipeline using scikit-learn >=1.3 "future" syntax
-
-    Parameters:
-    -----------
-    penalty : str, default="l2"
-        Supported: "l1", "l2", "elasticnet", None
-        - "l1"          => elasticnet => l1_ratio=1.0
-        - "l2"          => elasticnet => l1_ratio=0.0
-        - "elasticnet"  => elasticnet => l1_ratio=0.5 (default)
-        - None          => no regularization
-    C : float, default=1.0
-        Inverse of regularization strength
-    random_state : int, default=42, random seed for reproducibility
-
-    Returns:
-    --------
-    sklearn pipeline with StandardScaler + LogisticRegression ready for modelling
+    Pipeline for Logistic Regression classifer
     """
-    # Map "classic" penalties to future-proof elasticnet/none parameters
-    if penalty == "l1":
-        solver = "saga"
-        penalty_final = "elasticnet"
-        l1_ratio_final = 1.0
-    elif penalty == "l2":
-        solver = "saga"
-        penalty_final = "elasticnet"
-        l1_ratio_final = 0.0
-    elif penalty == "elasticnet":
-        solver = "saga"
-        penalty_final = "elasticnet"
-        l1_ratio_final = 0.5
-    elif penalty == None:
-        solver = "lbfgs"
-        penalty_final = None
-        l1_ratio_final = None
-    else:
-        raise ValueError(f"Unsupported penalty: {penalty}")
-
+    solver = "liblinear" if penalty == "l1" else "lbfgs"
+    
     return Pipeline([
         ("scaler", StandardScaler()),
         ("model", LogisticRegression(
-            penalty = penalty_final,
+            penalty = penalty,
             C = C,
             solver = solver,
-            l1_ratio = l1_ratio_final,
-            max_iter = 5000,
+            max_iter = 1000,
             random_state = random_state
         ))
     ])
-
 
 def rf_pipeline(n_estimators=200, max_depth=None, random_state=42):
     """
