@@ -1,0 +1,3 @@
+Model,Accuracy,Sensitivity,Specificity,AUC-ROC
+L1,0.9737,0.9524,0.9861,0.9964
+L2,0.9737,0.9524,0.9861,0.996
