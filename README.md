@@ -15,22 +15,33 @@ A machine learning classifier to assist radiologists in distinguishing malignant
 ```
 breast-cancer-classifier/
 ├── .github
+│   ├── issue_template.yaml
 │   └── pull_request_template.md
+├── .vscode
+│   └── settings.json
 ├── data
 │   ├── processed
 │   └── raw
-├── experiments
-├── models
 ├── notebooks
+│   ├── 01_eda.ipynb
+│   ├── 02_model_comparison.ipynb
 │   └── 02_preprocessing.ipynb
 ├── reports
 │   └── figures
 ├── src
-│   └── utils
+│   ├── __init__.py
+│   ├── compare.py
+│   ├── evaluate.py
+│   ├── generate_tree.py
+│   ├── pipelines.py
+│   ├── preprocessing.py
+│   ├── train.py
+│   └── tune.py
 ├── .gitignore
 ├── LICENSE
 ├── pyproject.toml
 ├── README.md
+├── repo_structure.md
 ├── repo_workflow.md
 └── SETUP.md
 ```
@@ -129,4 +140,4 @@ cd breast-cancer-classifier
 - downloads and installs package dependencies (requires  [`uv`](https://github.com/astral-sh/uv)).
 
 ---
-_Last Updated: 2026-03-01_
+_Last Updated: 2026-03-05_
