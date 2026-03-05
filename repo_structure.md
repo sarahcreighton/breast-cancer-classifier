@@ -15,7 +15,6 @@ breast-cancer-classifier/
 ├── reports
 │   └── figures
 ├── src
-│   ├── utils
 │   ├── __init__.py
 │   ├── compare.py
 │   ├── evaluate.py
@@ -28,6 +27,7 @@ breast-cancer-classifier/
 ├── LICENSE
 ├── pyproject.toml
 ├── README.md
+├── repo_structure.md
 ├── repo_workflow.md
 └── SETUP.md
 ```
