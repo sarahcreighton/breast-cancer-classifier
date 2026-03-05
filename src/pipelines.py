@@ -36,7 +36,7 @@ def logistic_pipeline(penalty="l2", C=1.0, random_state=42):
         ))
     ])
 
-def rf_pipeline(n_estimators=200, max_depth=None, random_state=42):
+def rf_pipeline(n_estimators=100, max_depth=None, random_state=42):
     """
     Pipeline for a Random Forest classifier
     """
