@@ -58,7 +58,7 @@ def load_raw_data(path: str) -> pd.DataFrame:
     if "id" in df.columns:
         df = df.drop(columns="id") 
 
-    # re-map target to categorical: 0=Malignant, 1=Benign
+    # re-map target to categorical: 1=Malignant, 0=Benign
     df["diagnosis"] = pd.Categorical(
         df["diagnosis"].map({"M": "malignant", "B": "benign"}),
         categories = ["malignant", "benign"]
@@ -69,7 +69,7 @@ def load_raw_data(path: str) -> pd.DataFrame:
 def get_Xy(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     """
     Separate data into features (X) and target (y).
-    Maps 'malignant' to 0 and 'benign' to 1.
+    Maps 'malignant' to 1 and 'benign' to 0.
 
     Parameters:
     ----------- 
@@ -86,7 +86,7 @@ def get_Xy(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     if "diagnosis" not in df.columns:
         raise ValueError("Column 'diagnosis' not found in DataFrame.")
     
-    df["diagnosis"] = df["diagnosis"].map({"malignant":0, "benign": 1})
+    df["diagnosis"] = df["diagnosis"].map({"malignant":1, "benign": 0})
     
     drop_cols = [col for col in ["id","diagnosis"] if col in df.columns]
     
