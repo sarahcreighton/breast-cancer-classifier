@@ -92,7 +92,8 @@ After hypertuning, the best SVM (C=10, rbf, gamma=0.01) achieved 98.25% accuracy
 
 Threshold tuning (0.5 → 0.2) was tested on both models. For SVM, lowering to 0.3 improved sensitivity to 97.6% with minimal specificity loss. RF was more sensitive to threshold changes, with accuracy dropping to ~93% at 0.2.
 
-![SVM Confusion Matrix](svm_confusion_3.png)
+![RF Threshold Performance](rf_thresholds_performance.png)
+![SVM Threshold Performance](svm_all_red_thresholds.png)
 
 Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-ROC.
 
@@ -104,6 +105,7 @@ Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-
 | SVM | 96.49% | 95.24% | 97.22% | 0.9848 | 2 | 2 |
 
 ![Tuned SVM Performance](tuned_svm.png)
+
 ---
 
 ## Key Findings
