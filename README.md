@@ -71,6 +71,15 @@ breast-cancer-classifier/
 
 ---
 
+## EDA Summary
+
+The dataset is clean and well-structured (569 rows, 30 numeric features, binary target) with no missing values, duplicates, or zero-variance features. Classes are moderately imbalanced (~63% benign), so stratified splitting and sensitivity/specificity metrics are preferred over accuracy.
+
+Multicollinearity is a key concern — correlated features like radius, perimeter, and area will require L1/L2 regularization and `StandardScaler()` for logistic regression, though tree-based models are more resilient. Despite this, the data is highly separable: PCA shows the first two components explain ~65% of variance with clear class separation, suggesting linear or low-dimensional models should perform well.
+![Pair Plot of Key Features](pair_plot_key_features.png)
+
+---
+
 ## Model Results
 
 | Model | Accuracy | Sensitivity | Specificity | AUC-ROC | Missed Cancers (FN) | Unnecessary Biopsies (FP) |
