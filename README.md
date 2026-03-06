@@ -64,9 +64,9 @@ breast-cancer-classifier/
 1. **Data Cleaning** — Missing value check, duplicate detection, outlier analysis (IQR)
 2. **EDA** — Data quality check, class imbalance, correlation/multicollinearity analysis, pair plots, PCA
 3. **Preprocessing** — Target encoding, StandardScaler normalization, stratified 80/20 train-test split
-4. **Baseline Model** — Logistic Regression
+4. **Baseline Model** — Logistic Regression with both L1 (Lasso) and L2 (Ridge) penalties compared
 5. **Advanced Models** — Random Forest, Support Vector Machine (SVM)
-6. **Hyperparameter Tuning** — GridSearchCV with 10-fold cross-validation, optimized for recall
+6. **Hyperparameter Tuning** — GridSearchCV with 10-fold cross-validation, optimized for recall; for Logistic Regression, penalty (L1/L2) and regularization strength (C) were included in the search grid
 7. **Evaluation** — AUC-ROC curves, confusion matrices, feature importance, threshold tuning
 
 ---
@@ -76,6 +76,9 @@ breast-cancer-classifier/
 The dataset is clean and well-structured (569 rows, 30 numeric features, binary target) with no missing values, duplicates, or zero-variance features. Classes are moderately imbalanced (~63% benign), so stratified splitting and sensitivity/specificity metrics are preferred over accuracy.
 
 Multicollinearity is a key concern — correlated features like radius, perimeter, and area will require L1/L2 regularization and `StandardScaler()` for logistic regression, though tree-based models are more resilient. Despite this, the data is highly separable: PCA shows the first two components explain ~65% of variance with clear class separation, suggesting linear or low-dimensional models should perform well.
+
+**L1 vs L2 regularization:** L1 (Lasso) can drive correlated feature coefficients to zero, acting as implicit feature selection. L2 (Ridge) shrinks correlated coefficients together without eliminating them. Both were tested given the high multicollinearity in this dataset (see baseline comparison below).
+
 
 ![Pair Plot of Key Features](pair_plot_key_features.png)
 
@@ -103,6 +106,10 @@ Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-
 | Random Forest (Default) | 97.37% | 92.86% | 100.00% | 0.9929 | 3 | 0 |
 | Random Forest (Tuned) | 96.49% | 90.48% | 100.00% | 0.9942 | 4 | 0 |
 | SVM | 96.49% | 95.24% | 97.22% | 0.9848 | 2 | 2 |
+| Logistic Regression — L1 (Baseline) | 97.37% | 95.24% | 98.61% | 0.9964 | 2 | 1 |
+| Logistic Regression — L2 (Baseline) | 97.37% | 95.24% | 98.61% | 0.9960 | 2 | 1 |
+
+> **L1 vs L2:** Both penalties produced identical accuracy, sensitivity, and specificity. L1 had a marginal AUC-ROC advantage (0.9964 vs 0.9960), suggesting slight benefit from its implicit feature selection given multicollinearity in the dataset.
 
 ![Tuned SVM Performance](tuned_svm.png)
 
