@@ -1,5 +1,33 @@
-# tune.py
+""" tune.py
 
+Example workflow in notebook:
+
+    # Step 1: define pipeline
+    p = logistic_pipeline()
+
+    # Step 2: get hyperparameter grid
+    grid = get_param_grid("logistic")
+
+    # Step 3: run grid search
+    best_model, best_params, best_score = tune_model(
+        p, grid, X_train, y_train)
+    print(best_params)
+    print(best_score)
+
+    # Step 4: evaluate tuned model
+    metrics, cm = evaluate_model(
+        best_model, X_test, y_test, model_name="Logistic (Tuned)"
+        )
+    
+    # Step 5: extract feature importance
+    impt = extract_feature_importance(best_model, X_train.columns)
+    impt_df = (
+        pd.Series(impt)
+        .sort_values(key=abs, ascending=False)
+        .head(10)
+    )
+    impt_df
+"""
 from sklearn.model_selection import GridSearchCV
 
 def get_param_grid(model_name: str) -> dict:
