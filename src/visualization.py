@@ -84,7 +84,7 @@ def plot_correlation_heatmap(df: pd.DataFrame, title="Feature Correlation Heatma
 
     return corr, high_corr
 
-def plot_pca(df, target="diagnosis", n_components=2, palette="Set2"):
+def plot_pca(df, target="diagnosis", n_components=2, palette="Set2", figsize=(6,5)):
     """
     Performs PCA on all features in df (excluding target) and plots 
     the first n_components (default=2).
@@ -106,7 +106,7 @@ def plot_pca(df, target="diagnosis", n_components=2, palette="Set2"):
     })
     pca_df[target] = y
 
-    plt.figure(figsize=(8,6))
+    plt.figure(figsize=figsize)
     sns.scatterplot(
         data=pca_df,
         x="PC1",
