@@ -4,6 +4,8 @@ from pathlib import Path
 To run: navigate to the folder this file is in in the terminal
 type python3 generate_tree.py and hit enter. The script should run
 automatically and output a file containing the project tree structure
+
+Author: SC 2026-02-28
 """
 
 EXCLUDE = {
@@ -77,13 +79,15 @@ def generate_tree(
 
 if __name__ == "__main__":
     # Example: limit the tree to 2 levels deep (root + one sub-folder level)
-    root = Path("../../")
+    root = Path("../")
     tree_lines = [root.resolve().name + "/"]
     tree_lines.extend(generate_tree(root, max_depth=2))
 
-    with open("PROJECT_STRUCTURE.md", "w") as f:
+    output_path = root / "repo_structure.md"
+
+    with open(output_path, "w") as f:
         f.write("```\n")
         f.write("\n".join(tree_lines))
         f.write("\n```")
 
-    print("Project structure written to PROJECT_STRUCTURE.md")
+    print(f"Project structure written to {output_path}")
