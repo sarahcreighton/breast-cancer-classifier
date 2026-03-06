@@ -36,19 +36,3 @@ def compare_models(models_dict, X_train, y_train, X_test, y_test):
     results_df = pd.concat(results)
     
     return results_df, cms, trained_models
-
-def run_baselines(models, X_train, X_test, y_train, y_test):
-
-    results = {}
-
-    for name, model in models.items():
-
-        model.fit(X_train, y_train)
-
-        metrics, cm = evaluate_model(
-            model, X_test, y_test, model_name=name
-        )
-
-        results[name] = metrics.iloc[0]
-
-    return pd.DataFrame(results).T
