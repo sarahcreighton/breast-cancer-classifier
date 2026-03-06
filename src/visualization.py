@@ -120,7 +120,7 @@ def plot_pca(df, target="diagnosis", n_components=2, palette="Set2", figsize=(6,
     plt.title("PCA Projection of Features")
     plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]*100:.1f}% variance)")
     plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]*100:.1f}% variance)")
-    plt.legend(title=target)
+    plt.legend(fontsize=12)
     
     sns.despine()
     plt.tight_layout()
@@ -389,6 +389,161 @@ def plot_model_feature_comparison(
 
 
 
+from sklearn.metrics import roc_curve, auc
+
+def plot_roc_curves(models: dict, X_test, y_test, figsize=(6,5), title="ROC Curve Comparison"):
+    """
+    Plot ROC curves for multiple models on the same figure.
+
+    Parameters:
+    -----------
+    models : dict
+        Dictionary of {model_name: fitted_model}.
+    X_test : array-like
+        Test features.
+    y_test : array-like
+        True labels.
+    figsize : tuple
+        Figure size (default: (6,5)).
+    title : str
+        Plot title.
+    """
+    plt.figure(figsize=figsize)
+    
+    for name, model in models.items():
+        # Get prediction probabilities or decision function
+        if hasattr(model, "predict_proba"):
+            y_proba = model.predict_proba(X_test)[:,1]
+        elif hasattr(model, "decision_function"):
+            y_proba = model.decision_function(X_test)
+        else:
+            print(f"Skipping {name}: no probability or decision_function available.")
+            continue
+
+        # Compute ROC curve and AUC
+        fpr, tpr, _ = roc_curve(y_test, y_proba)
+        roc_auc = auc(fpr, tpr)
+
+        plt.plot(fpr, tpr, label=f"{name} (AUC = {roc_auc:.3f})")
+    
+    # Plot diagonal
+    plt.plot([0,1], [0,1], linestyle="--", color="gray")
+    
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(title)
+    plt.legend(fontsize=10)
+    plt.grid(False)
+    plt.show()
+    
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_rf_feature_importances(model_dict, model_name, X_train, top_n=10, figsize=(7,5), palette="viridis"):
+    """
+    Plot top N feature importances from a Random Forest pipeline safely.
+
+    Handles NumPy arrays and missing keys gracefully.
+    """
+    if model_name not in model_dict:
+        print(f"{model_name} not found in model_dict. Skipping plot.")
+        return
+
+    rf_model = model_dict[model_name]
+
+    # Check if model is a pipeline
+    if hasattr(rf_model, "named_steps") and "model" in rf_model.named_steps:
+        rf_model_inner = rf_model.named_steps["model"]
+    else:
+        rf_model_inner = rf_model
+
+    # Ensure X_train is a DataFrame
+    if hasattr(X_train, "columns"):
+        features = X_train.columns
+    else:
+        features = [f"Feature {i}" for i in range(rf_model_inner.n_features_in_)]
+
+    importances = rf_model_inner.feature_importances_
+
+    importance_df = (
+        pd.DataFrame({
+            "feature": features,
+            "importance": importances
+        })
+        .sort_values("importance", ascending=False)
+        .head(top_n)
+    )
+
+    plt.figure(figsize=figsize)
+    sns.barplot(
+        data=importance_df,
+        x="importance",
+        y="feature",
+        hue="feature",
+        palette=palette
+    )
+    plt.title(f"Top {top_n} Feature Importances ({model_name})")
+    plt.xlabel("Importance")
+    plt.ylabel("Feature")
+    plt.legend([],[], frameon=False)  # remove redundant legend
+    plt.show()
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_logistic_coefficients(model, X_train, top_n=10, figsize=(7,5), palette="coolwarm", title=None):
+    """
+    Plot top N coefficients from a Logistic Regression model inside a pipeline.
+
+    Parameters:
+    -----------
+    model : pipeline
+        Trained Logistic Regression pipeline.
+    X_train : pd.DataFrame
+        Training features (for column names).
+    top_n : int
+        Number of top coefficients to display (by absolute value).
+    figsize : tuple
+        Figure size.
+    palette : str
+        Seaborn color palette.
+    title : str or None
+        Custom plot title. If None, a default title is used.
+    """
+    # Extract coefficients
+    coefs = model.named_steps["model"].coef_[0]
+
+    # Create DataFrame of top coefficients by absolute value
+    coef_df = (
+        pd.DataFrame({
+            "feature": X_train.columns,
+            "coefficient": coefs
+        })
+        .assign(abs_coef=lambda df: df["coefficient"].abs())
+        .sort_values("abs_coef", ascending=False)
+        .head(top_n)
+    )
+
+    plt.figure(figsize=figsize)
+    sns.barplot(
+        data=coef_df,
+        x="coefficient",
+        y="feature",
+        hue="feature",
+        palette=palette
+    )
+    plt.axvline(0, color="black", linewidth=1)
+    plt.title(title or f"Top {top_n} Logistic Regression Coefficients")
+    plt.xlabel("Coefficient Value")
+    plt.ylabel("Feature")
+    plt.legend([],[], frameon=False)  # Remove redundant legend
+    plt.show()
+    
 # def plot_feature_importance(features, importances, top_n=10, colors=None, title="Feature Importance"):
 #     """
 #     Plot horizontal bar chart of top N feature importances.
