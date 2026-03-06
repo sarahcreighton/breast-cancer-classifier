@@ -62,7 +62,7 @@ breast-cancer-classifier/
 ## Methodology
 
 1. **Data Cleaning** — Missing value check, duplicate detection, outlier analysis (IQR)
-2. **EDA** — Class distribution, feature distributions by diagnosis, box plots, scatter plots, correlation heatmap
+2. **EDA** — Data quality check, class imbalance, correlation/multicollinearity analysis, pair plots, PCA
 3. **Preprocessing** — Target encoding, StandardScaler normalization, stratified 80/20 train-test split
 4. **Baseline Model** — Logistic Regression
 5. **Advanced Models** — Random Forest, Support Vector Machine (SVM)
@@ -76,19 +76,34 @@ breast-cancer-classifier/
 The dataset is clean and well-structured (569 rows, 30 numeric features, binary target) with no missing values, duplicates, or zero-variance features. Classes are moderately imbalanced (~63% benign), so stratified splitting and sensitivity/specificity metrics are preferred over accuracy.
 
 Multicollinearity is a key concern — correlated features like radius, perimeter, and area will require L1/L2 regularization and `StandardScaler()` for logistic regression, though tree-based models are more resilient. Despite this, the data is highly separable: PCA shows the first two components explain ~65% of variance with clear class separation, suggesting linear or low-dimensional models should perform well.
+
 ![Pair Plot of Key Features](pair_plot_key_features.png)
 
 ---
 
 ## Model Results
 
+# Logistic Regression, Random Forest and SVM
+Three models were trained and compared — Logistic Regression, Random Forest, and SVM — all using stratified 80/20 splits and StandardScaler.
+
+Baseline results showed LR and default RF tied on accuracy (~97%), with SVM slightly behind. LR had the fewest false negatives (2), making it strong for medical use.
+
+After hypertuning, the best SVM (C=10, rbf, gamma=0.01) achieved 98.25% accuracy with perfect specificity and AUC-ROC of 0.996. The best RF used max_depth=15, log2 features, 200 estimators.
+
+Threshold tuning (0.5 → 0.2) was tested on both models. For SVM, lowering to 0.3 improved sensitivity to 97.6% with minimal specificity loss. RF was more sensitive to threshold changes, with accuracy dropping to ~93% at 0.2.
+
+![SVM Confusion Matrix](svm_confusion_3.png)
+
+Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-ROC.
+
 | Model | Accuracy | Sensitivity | Specificity | AUC-ROC | Missed Cancers (FN) | Unnecessary Biopsies (FP) |
 |---|---|---|---|---|---|---|
-| Logistic Regression (Baseline) | TBD | TBD | TBD | TBD | TBD | TBD |
-| Random Forest (Default) | TBD | TBD | TBD | TBD | TBD | TBD |
-| Random Forest (Tuned) | TBD | TBD | TBD | TBD | TBD | TBD |
-| SVM | TBD | TBD | TBD | TBD | TBD | TBD |
+| Logistic Regression (Baseline) | 97.37% | 95.24% | 98.61% | 0.9960 | 2 | 1 |
+| Random Forest (Default) | 97.37% | 92.86% | 100.00% | 0.9929 | 3 | 0 |
+| Random Forest (Tuned) | 96.49% | 90.48% | 100.00% | 0.9942 | 4 | 0 |
+| SVM | 96.49% | 95.24% | 97.22% | 0.9848 | 2 | 2 |
 
+![Tuned SVM Performance](tuned_svm.png)
 ---
 
 ## Key Findings
