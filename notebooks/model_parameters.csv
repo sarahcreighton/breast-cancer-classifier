@@ -1,0 +1,7 @@
+Model,C,class_weight,dual,fit_intercept,intercept_scaling,l1_ratio,max_iter,n_jobs,penalty,random_state,solver,tol,verbose,warm_start,break_ties,cache_size,coef0,decision_function_shape,degree,gamma,kernel,probability,shrinking,bootstrap,ccp_alpha,criterion,max_depth,max_features,max_leaf_nodes,max_samples,min_impurity_decrease,min_samples_leaf,min_samples_split,min_weight_fraction_leaf,monotonic_cst,n_estimators,oob_score
+Logistic (Tuned),1.0,,False,True,1.0,0.0,1000.0,,l2,42,lbfgs,0.0001,0,False,,,,,,,,,,,,,,,,,,,,,,,
+Support Vector (Tuned),1.0,,,,,,-1.0,,,42,,0.001,False,,False,200.0,0.0,ovr,3.0,scale,rbf,True,True,,,,,,,,,,,,,,
+Random Forest (Tuned),,,,,,,,,,42,,,0,False,,,,,,,,,,True,0.0,gini,5.0,sqrt,,,0.0,1.0,2.0,0.0,,100.0,False
+Logistic (Baseline),1.0,,False,True,1.0,0.0,1000.0,,l2,42,lbfgs,0.0001,0,False,,,,,,,,,,,,,,,,,,,,,,,
+Support Vector (Baseline),1.0,,,,,,-1.0,,,42,,0.001,False,,False,200.0,0.0,ovr,3.0,scale,rbf,True,True,,,,,,,,,,,,,,
+Random Forest (Baseline),,,,,,,,,,42,,,0,False,,,,,,,,,,True,0.0,gini,,sqrt,,,0.0,1.0,2.0,0.0,,100.0,False
