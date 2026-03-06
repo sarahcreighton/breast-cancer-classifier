@@ -75,7 +75,7 @@ def get_param_grid(model_name: str) -> dict:
         raise ValueError("Unknown model name.")
     
 
-def tune_model(pipeline, param_grid, X_train, y_train, cv=5, scoring="roc_auc", n_jobs=-1):
+def tune_model(pipeline, param_grid, X_train, y_train, cv=10, scoring="roc_auc", n_jobs=-1):
     """
     Perform grid search and return best estimator.
     """
