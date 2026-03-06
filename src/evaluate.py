@@ -16,6 +16,8 @@ from sklearn.metrics import(
     confusion_matrix
 )
 from sklearn.model_selection import cross_val_score
+from tune import get_param_grid, tune_model
+
 
 def evaluate_model(model, X_test, y_test, model_name="Model"):
     """
@@ -79,3 +81,42 @@ def cross_validate_model(model, X, y, cv=5, scoring="roc_auc", n_jobs=-1):
         "cv_std": np.std(scores),
         "cv_scores": scores
     }
+
+
+def tune_and_evaluate(model_name, pipe_fn, X_train, y_train, X_test, y_test):
+    """
+    Tune a model using grid search and evaluate on test data
+
+    Parameters:
+    -----------
+        model_name: str, name of the model (used for labeling metrics)
+        pipe_fn: function returning an unfitted pipeline
+        X_train, y_train, X_test, y_test: pd.DataFrame / pd.Series
+            train-test splits
+    
+    Returns:
+    --------
+    metrics: pd.DataFrame 
+        evaluation metrics (single-row)
+    cm: np.ndarray
+        confusion matrix
+    best_model: fitted pipeline
+        trained pipeline with best hyperparameters
+    best_params: dict
+        best hyperparameters from tuning
+    best_score: float
+        best cross-validation score from tuning
+    """
+    # initialize pipeline
+    pipe = pipe_fn()
+
+    # get hyperparameter grid
+    grid = get_param_grid(model_name.lower())
+
+    # tune the model
+    model, param, score = tune_model(pipe, grid, X_train, y_train)
+
+    # evaluate on test data
+    metrics, cm = evaluate_model(model, X_test, y_test, model_name=f"{model_name} (Tuned)")
+
+    return metrics, cm, model, param, score 
