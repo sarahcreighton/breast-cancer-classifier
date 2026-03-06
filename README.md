@@ -111,7 +111,6 @@ Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-
 
 > **L1 vs L2:** Both penalties produced identical accuracy, sensitivity, and specificity. L1 had a marginal AUC-ROC advantage (0.9964 vs 0.9960), suggesting slight benefit from its implicit feature selection given multicollinearity in the dataset.
 
-![Tuned SVM Performance](tuned_svm.png)
 
 ---
 
