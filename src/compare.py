@@ -36,3 +36,10 @@ def compare_models(models_dict, X_train, y_train, X_test, y_test):
     results_df = pd.concat(results)
     
     return results_df, cms, trained_models
+
+def stack_tuned_metrics(metrics_list, model_names):
+    """
+    Stack multiple single-row metrics DataFrames into one comparison table.
+    """
+    series_list = [m.iloc[0].rename(name) for m, name in zip(metrics_list, model_names)]
+    return pd.DataFrame(series_list)
