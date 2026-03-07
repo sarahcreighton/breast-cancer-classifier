@@ -25,6 +25,7 @@ breast-cancer-classifier/
 │   ├── figures
 │   └── models
 ├── src
+│   └── utils
 ├── .gitignore
 └── README.md
 ├── SETUP.md
@@ -62,7 +63,8 @@ breast-cancer-classifier/
 The dataset is clean and well-structured (569 rows, 30 numeric features, binary target) with no missing values, duplicates, or zero-variance features. Classes are moderately imbalanced (~63% benign), so stratified splitting and sensitivity/specificity metrics are preferred over accuracy.
 
 <img src="./results/figures/01_target_class_distribution.png" width=300 />
-<img src = "./results/figures/01_pca.png" width=291/>
+<img src = "./results/figures/01_pca.png" width=289/>
+
 Multicollinearity is a key concern — correlated features like radius, perimeter, and area will require L1/L2 regularization and `StandardScaler()` for logistic regression, though tree-based models are more resilient. Despite this, the data is highly separable: PCA shows the first two components explain ~65% of variance with clear class separation, suggesting linear or low-dimensional models should perform well.
 
 ### Feature Correlation Heatmap
@@ -130,7 +132,7 @@ For the random forest, size- and shape-related measurements such as worst area, 
 ## Logistic Regression Coefficient Magnitude
 In the logistic regression model, both geometric (e.g., size, shape) features and error-related measures (e.g., radius error, area error, compactness error) appear among the top coefficients, indicating that subtle deviations in these characteristics also influence the predicted probability of malignancy. 
 
-<img srg = "./results/02_regression_coef_tuned.png"/>
+<img srg = "./results/figures/02_regression_coef_tuned.png"/>
 
 Together, these results highlight that tumor size, shape irregularities, and measurement deviations are key factors driving model predictions.
 
