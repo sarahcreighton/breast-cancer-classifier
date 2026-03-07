@@ -132,7 +132,7 @@ For the random forest, size- and shape-related measurements such as worst area, 
 ## Logistic Regression Coefficient Magnitude
 In the logistic regression model, both geometric (e.g., size, shape) features and error-related measures (e.g., radius error, area error, compactness error) appear among the top coefficients, indicating that subtle deviations in these characteristics also influence the predicted probability of malignancy. 
 
-<img srg = "./results/figures/02_regression_coef_tuned.png"/>
+<img src = "./results/figures/02_regression_coef_tuned.png"/>
 
 Together, these results highlight that tumor size, shape irregularities, and measurement deviations are key factors driving model predictions.
 
