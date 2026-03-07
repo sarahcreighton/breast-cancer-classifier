@@ -24,7 +24,12 @@ breast-cancer-classifier/
 ├── results
 │   ├── figures
 │   └── models
-└── src
+├── src
+├── .gitignore
+└── README.md
+├── SETUP.md
+├── pyproject.toml
+└── uv.lock
 ```
 
 ---
@@ -56,14 +61,17 @@ breast-cancer-classifier/
 
 The dataset is clean and well-structured (569 rows, 30 numeric features, binary target) with no missing values, duplicates, or zero-variance features. Classes are moderately imbalanced (~63% benign), so stratified splitting and sensitivity/specificity metrics are preferred over accuracy.
 
-![Class Distribution](./results/figures/01_target_class_distribution.png)
-
+<img src="./results/figures/01_target_class_distribution.png" width=300 />
+<img src = "./results/figures/01_pca.png" width=291/>
 Multicollinearity is a key concern — correlated features like radius, perimeter, and area will require L1/L2 regularization and `StandardScaler()` for logistic regression, though tree-based models are more resilient. Despite this, the data is highly separable: PCA shows the first two components explain ~65% of variance with clear class separation, suggesting linear or low-dimensional models should perform well.
 
-![Feature Correlation Heatmap](./results/figures/01_feature_correlation_heatmap.png)
-![Pair Plot of Key Features](./results/figures/01_pair_plot_key_features.png)
+### Feature Correlation Heatmap
+<img src = "./results/figures/01_feature_correlation_heatmap.png" width=500 />
 
 **L1 vs L2 regularization:** L1 (Lasso) can drive correlated feature coefficients to zero, acting as implicit feature selection. L2 (Ridge) shrinks correlated coefficients together without eliminating them. Both were tested given the high multicollinearity in this dataset (see baseline comparison below).
+
+### Seperability & Feature Distribution
+<img src = "./results/figures/01_pair_plot_key_features.png" width=500/>
 
 ---
 
@@ -74,14 +82,6 @@ Three models were trained and compared — Logistic Regression, Random Forest, a
 
 Baseline results showed LR and default RF tied on accuracy (~97%), with SVM slightly behind. LR had the fewest false negatives (2), making it strong for medical use.
 
-After hypertuning, the best SVM (C=10, rbf, gamma=0.01) achieved 98.25% accuracy with perfect specificity and AUC-ROC of 0.996. The best RF used max_depth=15, log2 features, 200 estimators.
-
-Threshold tuning (0.5 → 0.2) was tested on both models. For SVM, lowering to 0.3 improved sensitivity to 97.6% with minimal specificity loss. RF was more sensitive to threshold changes, with accuracy dropping to ~93% at 0.2.
-
-![Sensitivity vs Specificity](./results/figures/02_tuned_svm.png)
-
-Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-ROC.
-
 | Model | Accuracy | Sensitivity | Specificity | AUC-ROC | Missed Cancers (FN) | Unnecessary Biopsies (FP) |
 |---|---|---|---|---|---|---|
 | Logistic Regression (Baseline) | 97.37% | 95.24% | 98.61% | 0.9960 | 2 | 1 |
@@ -91,40 +91,67 @@ Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-
 | Logistic Regression — L1 (Baseline) | 97.37% | 95.24% | 98.61% | 0.9964 | 2 | 1 |
 | Logistic Regression — L2 (Baseline) | 97.37% | 95.24% | 98.61% | 0.9960 | 2 | 1 |
 
+After hypertuning, the best SVM (C=10, rbf, gamma=0.01) achieved 98.25% accuracy with perfect specificity and AUC-ROC of 0.996. The best RF used max_depth=15, log2 features, 200 estimators.
+
 ## Sensitivity vs Specificity 
+We explored how changing the prediction threshold affects model performance. Lowering the threshold increases sensitivity, helping to catch more malignant cases, but reduces specificity, leading to more false positives. These curves allow us to select a threshold that balances patient safety with avoiding unnecessary procedures.
+
+Threshold tuning (0.5 → 0.2) was tested on all models. For SVM, lowering to 0.3 improved sensitivity to 97.6% with minimal specificity loss. RF was more sensitive to threshold changes, with accuracy dropping to ~93% at 0.2.
+
+<img src = "./results/figures/02_sensitivity_vs_specificity_curves.png" width=400/>
+
+## Model Selection
+**Overall winner: Tuned SVM** — best balance of sensitivity, specificity, and AUC-ROC.
+
+<img src = "./results/figures/02_tuned_svm.png" width=500 />
+
 ### Confusion Matrices per Threshold: Random Forest
-![RF Threshold Performance](./results/figures/02_rf_thresholds_performance.png)
+<img src = "./results/figures/02_rf_thresholds_performance.png" />
 
 ### Confusion Matrices per Threshold: SVM
-![SVM Threshold Performance](./results/figures/02_svm_all_red_thresholds.png)
+<img src = "./results/figures/02_svm_all_red_thresholds.png" />
 
-> **L1 vs L2:** Both penalties produced identical accuracy, sensitivity, and specificity. L1 had a marginal AUC-ROC advantage (0.9964 vs 0.9960), suggesting slight benefit from its implicit feature selection given multicollinearity in the dataset.
+### Regularization
+**L1 vs L2:** Both penalties produced identical accuracy, sensitivity, and specificity. L1 had a marginal AUC-ROC advantage (0.9964 vs 0.9960), suggesting slight benefit from its implicit feature selection given multicollinearity in the dataset.
 
 # Interpretability
-### Feature Importance
-![Feature Importance](./results/figures/02_feature_importance.png)
+For the random forest model, feature importance measures how much each feature contributes to reducing classification error. The top features indicate which variables the model relied on most heavily to distinguish malignant from benign tumors. 
 
-### Logistic Regression Coefficient Magnitude
-![Coefficient Magnitude](./results/figures/02_regression_coef_tuned.png)
----
+Similarly, for the logistic regression model, the magnitude of the coefficients reflects the influence of each feature on the predicted probability of malignancy. 
+
+Together, these analyses highlight the most predictive features and provide insight into which measurements are most relevant for clinical interpretation.
+
+Across the models, several features consistently emerage as most predictive: 
+
+## Feature Importance
+For the random forest, size- and shape-related measurements such as worst area, worst concave points, and worst radius dominate the top 10 importances, reflecting their strong contribution to distinguishing malignant from benign tumors. 
+<img src = "./results/figures/02_feature_importance.png"/>
+
+## Logistic Regression Coefficient Magnitude
+In the logistic regression model, both geometric (e.g., size, shape) features and error-related measures (e.g., radius error, area error, compactness error) appear among the top coefficients, indicating that subtle deviations in these characteristics also influence the predicted probability of malignancy. 
+
+<img srg = "./results/02_regression_coef_tuned.png"/>
+
+Together, these results highlight that tumor size, shape irregularities, and measurement deviations are key factors driving model predictions.
+
 
 # Key Findings
 
-- TBD — Top predictive features (e.g., worst concave points, worst radius)
-- TBD — Recommended clinical threshold and sensitivity/specificity trade-off
-- TBD — Best performing model for clinical use case
+- Top predictive features: tumor size, shape irregularities, and measurement deviations
+- Recommended clinical threshold and sensitivity/specificity trade-off: 0.2 - 0.5
+- Best performing model for clinical use case: SVM
 
----
 
 # Clinical Interpretation
 
 - **Sensitivity is the priority metric** — a false negative (missed cancer) is far more costly than a false positive (unnecessary biopsy)
 - **Threshold tuning** allows the model to be calibrated to clinical risk tolerance
+    - models achieve excellent sensitivity and specificity, indicating strong potential for reliable cancer detection
 - **Feature importance** maps directly to measurable cell morphology properties, supporting radiologist trust and interpretability
+    - tumor size and shape features are the most predictive, aligning with clinical intuition
 
----
 
-## Limitations & Next Steps
+# Limitations & Next Steps
 
 - Small dataset (569 patients) — real deployment requires larger, more diverse cohorts
 - Features are computed from FNA images, not raw image pixels — deep learning on raw images may improve performance
