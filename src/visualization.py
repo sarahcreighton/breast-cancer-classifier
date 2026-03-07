@@ -544,6 +544,59 @@ def plot_logistic_coefficients(model, X_train, top_n=10, figsize=(7,5), palette=
     plt.legend([],[], frameon=False)  # Remove redundant legend
     plt.show()
     
+
+from sklearn.metrics import confusion_matrix
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_sensitivity_specificity(models: dict, X_test, y_test, thresholds=None, figsize=(7,5), title="Sensitivity & Specificity vs Threshold"):
+    """
+    Plot sensitivity and specificity for multiple models across a range of decision thresholds.
+
+    Parameters:
+    -----------
+    models : dict
+        Dictionary of {model_name: fitted_model}.
+    X_test : array-like
+        Test features.
+    y_test : array-like
+        True labels.
+    thresholds : array-like, optional
+        Thresholds to evaluate. Default: 0.0 to 1.0 in 0.1 increments.
+    figsize : tuple
+        Figure size.
+    title : str
+        Plot title.
+    """
+    if thresholds is None:
+        thresholds = np.linspace(0, 1, 11)
+    
+    plt.figure(figsize=figsize)
+    
+    for name, model in models.items():
+        if hasattr(model, "predict_proba"):
+            y_proba = model.predict_proba(X_test)[:,1]
+        else:
+            print(f"Skipping {name}: no predict_proba method.")
+            continue
+
+        sens_list, spec_list = [], []
+        for t in thresholds:
+            y_pred = (y_proba >= t).astype(int)
+            tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+            sens_list.append(tp / (tp + fn))
+            spec_list.append(tn / (tn + fp))
+
+        plt.plot(thresholds, sens_list, marker='o', label=f"{name} Sensitivity")
+        plt.plot(thresholds, spec_list, marker='x', label=f"{name} Specificity")
+    
+    plt.xlabel("Decision Threshold")
+    plt.ylabel("Metric Value")
+    plt.title(title)
+    plt.grid(False)
+    plt.legend(fontsize=12)
+    plt.show()
+    
 # def plot_feature_importance(features, importances, top_n=10, colors=None, title="Feature Importance"):
 #     """
 #     Plot horizontal bar chart of top N feature importances.
