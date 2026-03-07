@@ -15,35 +15,16 @@ A machine learning classifier to assist radiologists in distinguishing malignant
 ```
 breast-cancer-classifier/
 ├── .github
-│   ├── issue_template.yaml
-│   └── pull_request_template.md
 ├── .vscode
-│   └── settings.json
 ├── data
 │   ├── processed
 │   └── raw
 ├── notebooks
-│   ├── 01_eda.ipynb
-│   ├── 02_model_comparison.ipynb
-│   └── 02_preprocessing.ipynb
-├── reports
-│   └── figures
-├── src
-│   ├── __init__.py
-│   ├── compare.py
-│   ├── evaluate.py
-│   ├── generate_tree.py
-│   ├── pipelines.py
-│   ├── preprocessing.py
-│   ├── train.py
-│   └── tune.py
-├── .gitignore
-├── LICENSE
-├── pyproject.toml
-├── README.md
-├── repo_structure.md
-├── repo_workflow.md
-└── SETUP.md
+│   └── exploration
+├── results
+│   ├── figures
+│   └── models
+└── src
 ```
 
 ---
@@ -67,7 +48,7 @@ breast-cancer-classifier/
 4. **Baseline Model** — Logistic Regression with both L1 (Lasso) and L2 (Ridge) penalties compared
 5. **Advanced Models** — Random Forest, Support Vector Machine (SVM)
 6. **Hyperparameter Tuning** — GridSearchCV with 10-fold cross-validation, optimized for recall; for Logistic Regression, penalty (L1/L2) and regularization strength (C) were included in the search grid
-7. **Evaluation** — AUC-ROC curves, confusion matrices, feature importance, threshold tuning
+7. **Evaluation** — AUC-ROC curves, confusion matrices, feature importance, coefficient magnitude, threshold tuning
 
 ---
 
@@ -75,18 +56,20 @@ breast-cancer-classifier/
 
 The dataset is clean and well-structured (569 rows, 30 numeric features, binary target) with no missing values, duplicates, or zero-variance features. Classes are moderately imbalanced (~63% benign), so stratified splitting and sensitivity/specificity metrics are preferred over accuracy.
 
+![Class Distribution](./results/figures/01_target_class_distribution.png)
+
 Multicollinearity is a key concern — correlated features like radius, perimeter, and area will require L1/L2 regularization and `StandardScaler()` for logistic regression, though tree-based models are more resilient. Despite this, the data is highly separable: PCA shows the first two components explain ~65% of variance with clear class separation, suggesting linear or low-dimensional models should perform well.
+
+![Feature Correlation Heatmap](./results/figures/01_feature_correlation_heatmap.png)
+![Pair Plot of Key Features](./results/figures/01_pair_plot_key_features.png)
 
 **L1 vs L2 regularization:** L1 (Lasso) can drive correlated feature coefficients to zero, acting as implicit feature selection. L2 (Ridge) shrinks correlated coefficients together without eliminating them. Both were tested given the high multicollinearity in this dataset (see baseline comparison below).
 
-
-![Pair Plot of Key Features](pair_plot_key_features.png)
-
 ---
 
-## Model Results
+# Model Results
 
-# Logistic Regression, Random Forest and SVM
+## Logistic Regression, Random Forest and SVM
 Three models were trained and compared — Logistic Regression, Random Forest, and SVM — all using stratified 80/20 splits and StandardScaler.
 
 Baseline results showed LR and default RF tied on accuracy (~97%), with SVM slightly behind. LR had the fewest false negatives (2), making it strong for medical use.
@@ -95,8 +78,7 @@ After hypertuning, the best SVM (C=10, rbf, gamma=0.01) achieved 98.25% accuracy
 
 Threshold tuning (0.5 → 0.2) was tested on both models. For SVM, lowering to 0.3 improved sensitivity to 97.6% with minimal specificity loss. RF was more sensitive to threshold changes, with accuracy dropping to ~93% at 0.2.
 
-![RF Threshold Performance](rf_thresholds_performance.png)
-![SVM Threshold Performance](svm_all_red_thresholds.png)
+![Sensitivity vs Specificity](./results/figures/02_tuned_svm.png)
 
 Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-ROC.
 
@@ -109,12 +91,24 @@ Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-
 | Logistic Regression — L1 (Baseline) | 97.37% | 95.24% | 98.61% | 0.9964 | 2 | 1 |
 | Logistic Regression — L2 (Baseline) | 97.37% | 95.24% | 98.61% | 0.9960 | 2 | 1 |
 
+## Sensitivity vs Specificity 
+### Confusion Matrices per Threshold: Random Forest
+![RF Threshold Performance](./results/figures/02_rf_thresholds_performance.png)
+
+### Confusion Matrices per Threshold: SVM
+![SVM Threshold Performance](./results/figures/02_svm_all_red_thresholds.png)
+
 > **L1 vs L2:** Both penalties produced identical accuracy, sensitivity, and specificity. L1 had a marginal AUC-ROC advantage (0.9964 vs 0.9960), suggesting slight benefit from its implicit feature selection given multicollinearity in the dataset.
 
+# Interpretability
+### Feature Importance
+![Feature Importance](./results/figures/02_feature_importance.png)
 
+### Logistic Regression Coefficient Magnitude
+![Coefficient Magnitude](./results/figures/02_regression_coef_tuned.png)
 ---
 
-## Key Findings
+# Key Findings
 
 - TBD — Top predictive features (e.g., worst concave points, worst radius)
 - TBD — Recommended clinical threshold and sensitivity/specificity trade-off
@@ -122,7 +116,7 @@ Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-
 
 ---
 
-## Clinical Interpretation
+# Clinical Interpretation
 
 - **Sensitivity is the priority metric** — a false negative (missed cancer) is far more costly than a false positive (unnecessary biopsy)
 - **Threshold tuning** allows the model to be calibrated to clinical risk tolerance
@@ -155,7 +149,7 @@ Overall winner: Tuned SVM — best balance of sensitivity, specificity, and AUC-
 - **Language:** Python >= 3.11
 - **Libraries:** scikit-learn, pandas, numpy, matplotlib, seaborn *(see also [pyproject.toml](https://github.com/sarahcreighton/breast-cancer-classifier/blob/main/pyproject.toml))*
 - **Environment:** [uv](https://github.com/astral-sh/uv)
-- **IDE:** VS Code
+- **IDE:** Visual Studio Code
 
 ---
 
@@ -172,4 +166,4 @@ cd breast-cancer-classifier
 - downloads and installs package dependencies (requires  [`uv`](https://github.com/astral-sh/uv)).
 
 ---
-_Last Updated: 2026-03-05_
+_Last Updated: 2026-03-06_

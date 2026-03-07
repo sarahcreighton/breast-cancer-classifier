@@ -17,10 +17,12 @@ EXCLUDE = {
     ".venv",
     "wdbc-env",
     "tmp",
-    "uv.lock",
-    # ".github",
-    # ".gitignore",
-    ".gitkeep"
+    # "uv.lock",
+    #  ".github",
+    #  ".gitignore",
+    ".gitkeep",
+    "__init__",
+    ".vscode"
 }
 
 def generate_tree(
@@ -49,7 +51,7 @@ def generate_tree(
     
     # Gather children, ignoring anthing in EXCLUDE
     contents = sorted(
-        [item for item in directory.iterdir() if item.name not in EXCLUDE],
+        [item for item in directory.iterdir() if item.is_dir() and item.name not in EXCLUDE],
         key=lambda x: (x.is_file(), x.name.lower())
     )
 
